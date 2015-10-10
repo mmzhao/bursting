@@ -118,7 +118,7 @@ router.param('user', function(req, res, next, id) {
 router.get('/login/:device_id', function(req, res, next) {
   models.User.findOne({device_id: req.params.device_id}).exec(function(err, user) {
     if(err) {
-      utils.handleResponse(null, err, 400, res);
+      utils.handleResponse(null, null, 400, res);
     }
     else{
       utils.handleResponse(user, null, 200, res);
@@ -228,21 +228,29 @@ router.post('/ratings', function(req, res, next) {
       ratings: newRating._id
     }
   }
-  // add to the other already existing ucce that is an endpoint
-  models.User.findOneAndUpdate({_id: user}, newValues, function(err) {
-    if(err) callback(err);
+  models.Restroom.findById(restroom).exec(function(err, rr) {
+    if(err) utils.handleResponse(null, err, 400, res);
+    else if(!rr) utils.handleResponse(null, 'can\'t find Restroom Object with id ' + restroom, 400, res);
     else{
-      models.Restroom.findById(restroom).exec(function(err, rr) {
-        newValues.score = (rr.score * rr.ratings.length + score)/(rr.ratings.length + 1);
-        console.log(newValues);
-        models.Restroom.findOneAndUpdate({_id: restroom}, newValues, function(err) {
-          newRating.save(function(err, newrating) {
+      models.User.findById(user).exec(function(err, u) {
+        if(err) utils.handleResponse(null, err, 400, res);
+        if(!u) utils.handleResponse(null, 'can\'t find User Object with id ' + user, 400, res);
+        else{
+          models.User.findOneAndUpdate({_id: user}, newValues, function(err) {
             if(err) utils.handleResponse(null, err, 400, res);
-            else {
-              utils.handleResponse(newrating, null, 201, res);
+            else{
+              newValues.score = (rr.score * rr.ratings.length + score)/(rr.ratings.length + 1);
+              models.Restroom.findOneAndUpdate({_id: restroom}, newValues, function(err) {
+                newRating.save(function(err, newrating) {
+                  if(err) utils.handleResponse(null, err, 400, res);
+                  else {
+                    utils.handleResponse(newrating, null, 201, res);
+                  }
+                });
+              });
             }
           });
-        });
+        }
       });
     }
   });
