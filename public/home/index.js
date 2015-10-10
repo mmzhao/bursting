@@ -76,13 +76,31 @@ app.controller('ProductCtrl', ['$scope', '$window', 'Backend', function($scope, 
       zoom: 13,
       center: myLatLng
     });
-    for(var i = 0; i < $scope.restrooms.length; i++) {
+
+    var infowindow = new google.maps.InfoWindow({});
+
+    var createMarker = function(i) {
+      var contentString = 
+        '<h1 id="firstHeading" class="firstHeading">'+$scope.restrooms[i].name+'</h1>'+
+          '<p>Score: '+$scope.restrooms[i].score+'</p>'
+      // var infowindow = new google.maps.InfoWindow({
+      //   content: contentString
+      // });
       var marker = new google.maps.Marker({
         position: $scope.restrooms[i],
         map: map,
-        label: $scope.restrooms.score,
-        title: $scope.restrooms[i].name
+        label: '0123456789'.charAt($scope.restrooms[i].score),
+        title: $scope.restrooms[i].name,
+        content: contentString
       });
+      google.maps.event.addListener(marker, 'click', function() {
+        infowindow.setContent(contentString); 
+        infowindow.open(map, marker);
+      });
+    }
+
+    for(var i = 0; i < $scope.restrooms.length; i++) {
+      createMarker(i);
     }
   }
   initMap();
