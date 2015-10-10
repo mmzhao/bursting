@@ -16,6 +16,9 @@ app.config(['$stateProvider', '$urlRouterProvider', function($stateProvider, $ur
             restroomPromise: ['Backend', function(Backend) {
               return Backend.getRestrooms();
             }],
+            ratingPromise: ['Backend', function(Backend) {
+              return Backend.getRatings();
+            }],
           }
         },
       }

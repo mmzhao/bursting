@@ -5,7 +5,8 @@ var app = angular.module('utilities', ['ui.router','ui.bootstrap']);
 app.factory('Backend', ['$http', '$window', function($http, $window) {
   var backend = {
     users: [],
-    restrooms: []
+    restrooms: [],
+    ratings: []
   };
 
   // backend.getPositions = function(top, bottom, left, right) {
@@ -43,6 +44,14 @@ app.factory('Backend', ['$http', '$window', function($http, $window) {
       alert("ERROR: " + error);
     });
   };
+
+  backend.getRatings = function() {
+    return $http.get('/api/ratings').success(function(data) {
+      angular.copy(data, backend.ratings);
+    }).error(function(error) {
+      alert("ERROR: " + error);
+    });
+  };
   
 
   return backend;
@@ -52,6 +61,7 @@ app.factory('Backend', ['$http', '$window', function($http, $window) {
 app.controller('ProductCtrl', ['$scope', '$window', 'Backend', function($scope, $window, backend){
   $scope.users = backend.users;
   $scope.restrooms = backend.restrooms;
+  $scope.ratings = backend.ratings;
   // $scope.messages = [];
   // for(var i = 0; i < $scope.practices.length; i++) {
   //   $scope.messages.push($scope.practices[i].message);
