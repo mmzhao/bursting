@@ -115,6 +115,41 @@ router.param('user', function(req, res, next, id) {
   });
 });
 
+router.get('/login/:device_id', function(req, res, next) {
+  models.User.findOne({device_id: req.params.device_id}).exec(function(err, user) {
+    if(err) {
+      utils.handleResponse(null, err, 400, res);
+    }
+    else{
+      utils.handleResponse(user, null, 200, res);
+    }
+  });
+});
+
+router.post('/signup', function(req, res, next) {
+  var username = req.body.username;
+  var device_id = req.body.device_id;
+  models.User.findOne({device_id: device_id}).exec(function(err, user) {
+    if(err) utils.handleResponse(null, err, 400, res);
+    else if(user) utils.handleResponse(null, new Error('User with device_id ' + device_id + ' already exists'), 400, res);
+    else {
+      var newUser = new models.User({
+        username: username,
+        device_id: device_id,
+        ratings: []
+      });
+
+      newUser.save(function(err, newuser) {
+        if(err) utils.handleResponse(null, err, 400, res);
+        else {
+          utils.handleResponse(newuser, null, 201, res);
+        }
+      });
+    }
+  });
+  
+});
+
 router.get('/users', function(req, res, next) {
   models.User.find().exec(function(err, users) {
     if(err) {
@@ -180,10 +215,12 @@ router.post('/ratings', function(req, res, next) {
   var score = req.body.score;
   var user = req.body.user;
   var restroom = req.body.restroom;
+  var description = req.body.description;
   var newRating = new models.Rating({
     score: score,
     user: user,
-    restroom: restroom
+    restroom: restroom,
+    description: description
   });
 
   var newValues = {
