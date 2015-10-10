@@ -6,7 +6,8 @@ var restroomSchema = new Schema({
   lng: {type: Number, required: true},
   name: {type: String, required: true},
   score: {type: Number},
-  ratings: [{type: Schema.Types.ObjectId, ref: 'Rating'}]
+  ratings: [{type: Schema.Types.ObjectId, ref: 'Rating'}],
+  units: {type: Number}
 });
 
 mongoose.model('Restroom', restroomSchema);
