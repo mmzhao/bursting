@@ -118,6 +118,9 @@ router.param('user', function(req, res, next, id) {
 router.get('/login/:device_id', function(req, res, next) {
   models.User.findOne({device_id: req.params.device_id}).exec(function(err, user) {
     if(err) {
+      utils.handleResponse(null, err, 400, res);
+    }
+    if(!user) {
       utils.handleResponse(null, null, 400, res);
     }
     else{
