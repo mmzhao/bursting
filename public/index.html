@@ -1,0 +1,33 @@
+<html>
+  <head>
+    <title>Utilites</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.10/angular.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <script src="./3rdParty/ui-bootstrap-tpls-0.12.1.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.10/angular-ui-router.js"></script>
+    <link rel="stylesheet" href="style/style.css"/>
+    <script src="/home/index.js"></script>
+    <script src='/config.js'></script>
+    <meta name="viewport" content="initial-scale=1.0">
+    <meta charset="utf-8">
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+    <style>
+      html, body {
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      #map {
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body ng-app="utilities">
+    <div class="row">
+      <div class="col-md-10 col-md-offset-1">
+        <ui-view></ui-view>
+      </div>
+    </div>
+  </body>
+</html>
