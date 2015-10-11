@@ -118,7 +118,7 @@ router.param('user', function(req, res, next, id) {
 });
 
 router.get('/login/:device_id', function(req, res, next) {
-  models.User.findOne({device_id: req.params.device_id}).exec(function(err, user) {
+  models.User.findOne({device_id: req.params.device_id}).populate("ratings").exec(function(err, user) {
     if(err) {
       utils.handleResponse(null, err, 400, res);
     }
