@@ -1,5 +1,5 @@
-Compatibility Tool
+Toilecation
 ====================
 
 
-Compatibility Tool provides information regarding what software and hardware are compatible with each version of UCCE as well as the upgrade paths from version to version.
+Toilecation, formerly known as Bursting, will help you relieve youself of all your excremental needs.
