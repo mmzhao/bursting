@@ -220,6 +220,7 @@ router.post('/ratings', function(req, res, next) {
   var score = req.body.score;
   var user = req.body.user;
   var restroom = req.body.restroom;
+  console.log(restroom);
   var description = req.body.description;
   var newRating = new models.Rating({
     score: score,
@@ -242,7 +243,7 @@ router.post('/ratings', function(req, res, next) {
         else{
           models.Restroom.findById(restroom).exec(function(err, rr) {
             if(err) utils.handleResponse(null, err, 400, res);
-            else if(!rr) {
+            else if(!rr || restroom == undefined) {
               var lat = req.body.lat;
               var lng = req.body.lng;
               var name = req.body.name;
