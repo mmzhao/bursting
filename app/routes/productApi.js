@@ -82,12 +82,14 @@ router.post('/restrooms', function(req, res, next) {
   var lat = req.body.lat;
   var lng = req.body.lng;
   var name = req.body.name;
+  var units = req.body.units;
   var newRestroom = new models.Restroom({
     lat: lat,
     lng: lng,
     name: name,
     score: 0,
-    ratings: []
+    ratings: [],
+    units: units
   });
 
   newRestroom.save(function(err, newrestroom) {
@@ -116,7 +118,7 @@ router.param('user', function(req, res, next, id) {
 });
 
 router.get('/login/:device_id', function(req, res, next) {
-  models.User.findOne({device_id: req.params.device_id}).exec(function(err, user) {
+  models.User.findOne({device_id: req.params.device_id}).populate("ratings").exec(function(err, user) {
     if(err) {
       utils.handleResponse(null, err, 400, res);
     }
@@ -154,7 +156,7 @@ router.post('/signup', function(req, res, next) {
 });
 
 router.get('/users', function(req, res, next) {
-  models.User.find().exec(function(err, users) {
+  models.User.find().populate("ratings").exec(function(err, users) {
     if(err) {
       utils.handleResponse(null, err, 400, res);
     }
@@ -164,24 +166,24 @@ router.get('/users', function(req, res, next) {
   });
 });
 
-router.get('/users/:user', function(req, res) {
-  utils.handleResponse(req.user, null, 200, res);
-});
+// router.get('/users/:user', function(req, res) {
+//   utils.handleResponse(req.user, null, 200, res);
+// });
 
-router.post('/users', function(req, res, next) {
-  var username = req.body.username;
-  var newUser = new models.User({
-    username: username,
-    ratings: []
-  });
+// router.post('/users', function(req, res, next) {
+//   var username = req.body.username;
+//   var newUser = new models.User({
+//     username: username,
+//     ratings: []
+//   });
 
-  newUser.save(function(err, newuser) {
-    if(err) utils.handleResponse(null, err, 400, res);
-    else {
-      utils.handleResponse(newuser, null, 201, res);
-    }
-  });
-});
+//   newUser.save(function(err, newuser) {
+//     if(err) utils.handleResponse(null, err, 400, res);
+//     else {
+//       utils.handleResponse(newuser, null, 201, res);
+//     }
+//   });
+// });
 
 
 router.param('rating', function(req, res, next, id) {
@@ -218,6 +220,7 @@ router.post('/ratings', function(req, res, next) {
   var score = req.body.score;
   var user = req.body.user;
   var restroom = req.body.restroom;
+  console.log(restroom);
   var description = req.body.description;
   var newRating = new models.Rating({
     score: score,
@@ -231,16 +234,42 @@ router.post('/ratings', function(req, res, next) {
       ratings: newRating._id
     }
   }
-  models.Restroom.findById(restroom).exec(function(err, rr) {
+  models.User.findById(user).exec(function(err, u) {
     if(err) utils.handleResponse(null, err, 400, res);
-    else if(!rr) utils.handleResponse(null, 'can\'t find Restroom Object with id ' + restroom, 400, res);
+    if(!u) utils.handleResponse(null, 'can\'t find User Object with id ' + user, 400, res);
     else{
-      models.User.findById(user).exec(function(err, u) {
+      models.User.findOneAndUpdate({_id: user}, newValues, function(err) {
         if(err) utils.handleResponse(null, err, 400, res);
-        if(!u) utils.handleResponse(null, 'can\'t find User Object with id ' + user, 400, res);
         else{
-          models.User.findOneAndUpdate({_id: user}, newValues, function(err) {
+          models.Restroom.findById(restroom).exec(function(err, rr) {
             if(err) utils.handleResponse(null, err, 400, res);
+            else if(!rr || restroom == undefined) {
+              var lat = req.body.lat;
+              var lng = req.body.lng;
+              var name = req.body.name;
+              var units = req.body.units;
+              var newRestroom = new models.Restroom({
+                lat: lat,
+                lng: lng,
+                name: name,
+                score: score,
+                ratings: [newRating._id],
+                units: units
+              });
+
+              newRestroom.save(function(err, newrestroom) {
+                if(err) utils.handleResponse(null, err, 400, res);
+                else {
+                  newRating.restroom = newrestroom._id;
+                  newRating.save(function(err, newrating) {
+                    if(err) utils.handleResponse(null, err, 400, res);
+                    else {
+                      utils.handleResponse(newrating, null, 201, res);
+                    }
+                  });
+                }
+              });
+            }
             else{
               newValues.score = (rr.score * rr.ratings.length + score)/(rr.ratings.length + 1);
               models.Restroom.findOneAndUpdate({_id: restroom}, newValues, function(err) {
