@@ -156,7 +156,7 @@ router.post('/signup', function(req, res, next) {
 });
 
 router.get('/users', function(req, res, next) {
-  models.User.find().exec(function(err, users) {
+  models.User.find().populate("ratings").exec(function(err, users) {
     if(err) {
       utils.handleResponse(null, err, 400, res);
     }
@@ -166,24 +166,24 @@ router.get('/users', function(req, res, next) {
   });
 });
 
-router.get('/users/:user', function(req, res) {
-  utils.handleResponse(req.user, null, 200, res);
-});
+// router.get('/users/:user', function(req, res) {
+//   utils.handleResponse(req.user, null, 200, res);
+// });
 
-router.post('/users', function(req, res, next) {
-  var username = req.body.username;
-  var newUser = new models.User({
-    username: username,
-    ratings: []
-  });
+// router.post('/users', function(req, res, next) {
+//   var username = req.body.username;
+//   var newUser = new models.User({
+//     username: username,
+//     ratings: []
+//   });
 
-  newUser.save(function(err, newuser) {
-    if(err) utils.handleResponse(null, err, 400, res);
-    else {
-      utils.handleResponse(newuser, null, 201, res);
-    }
-  });
-});
+//   newUser.save(function(err, newuser) {
+//     if(err) utils.handleResponse(null, err, 400, res);
+//     else {
+//       utils.handleResponse(newuser, null, 201, res);
+//     }
+//   });
+// });
 
 
 router.param('rating', function(req, res, next, id) {
